@@ -1,3 +1,4 @@
+--ываыаывп
 game.display_message("Running main.lua")
 
 dofile("game_trigger_manager.lua")
