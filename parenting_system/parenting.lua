@@ -1,4 +1,4 @@
-Object = {objectID = -1, parent = nil, children = {}, dict = -1, objectsList = objectsXYM3Z, animationSpeed = 1}
+Object = {objectID = -1, parent = nil, children = {}, dict = -1, objectsList = objectsXYM3Z, animationSpeed = 30, rotationAroundX = 0}
 
 local prop_instance_is_valid = game.prop_instance_is_valid
 local init_position = game.init_position
@@ -77,6 +77,7 @@ function Object:addChild(childID)
   
   if newChild == nil then
     newChild = dofile("parenting_system/parenting.lua")
+	newChild.animationSpeed = self.animationSpeed
     newChild.objectID = childID
   else
 	if newChild.parent ~= nil then
@@ -333,7 +334,7 @@ function Object:move(id, xx, yy, zz)
 end
 
 
-function Object:updatePosition()
+function Object:updatePosition(teleport)
 
   if prop_instance_is_valid(self.objectID) == false then
     return
@@ -342,13 +343,22 @@ function Object:updatePosition()
   --game.display_message("position update in " .. tostring(self.objectID))
   --x = game.display_message("my x: " .. tostring(game.position_get_x(0, 2)) .. ", my y: " .. tostring(game.position_get_y(0, 2)) .. ", my z: " .. tostring(game.position_get_z(0, 2)))
 
+	
+	
+	if not (self.rotationAroundX == 0) then
+			self.parent:initPos(self, self.objectID)
+	end
 	dict_get_pos(0, self.dict, tostring(self.objectID))
   
 
 	if self.parent.objectID == -1 then
 		--init_position(1)
 	else
-        prop_instance_get_position(1, self.parent.objectID)
+        --prop_instance_get_position(1, self.parent.objectID)
+		
+		
+		dict_get_pos(1, self.parent.dict, tostring(self.parent.objectID))
+		
 	end
   
     --x = game.display_message("parent x: " .. tostring(game.position_get_x(0, 1)) .. ", parent y: " .. tostring(game.position_get_y(0, 1)) .. ", parent z: " .. tostring(game.position_get_z(0, 1)))
@@ -356,16 +366,35 @@ function Object:updatePosition()
   
 	if self.parent ~= nil and  (prop_instance_is_valid(self.parent.objectID) or self.parent.objectID == -1) then
 	  
-	    --game.display_message("rel x: " .. tostring(game.position_get_x(0, 0)) .. ", new y: " .. tostring(game.position_get_y(0, 0)) .. ", new z: " .. tostring(game.position_get_z(0, 0)))
-		--prop_instance_get_position(2, self.objectID)
-        --game.display_message("old x: " .. tostring(game.position_get_x(0, 2)) .. ", new y: " .. tostring(game.position_get_y(0, 2)) .. ", new z: " .. tostring(game.position_get_z(0, 2)))
-	 
-		if self.parent.objectID ~= -1 then
-			position_transform_position_to_parent(2, 1, 0)
-			prop_instance_set_position(self.objectID, 2)
+		if teleport == 1 then
+			if self.parent.objectID ~= -1 then
+				position_transform_position_to_parent(2, 1, 0)
+			    prop_instance_set_position(self.objectID, 2)
+			else
+				prop_instance_set_position(self.objectID, 0)
+			end
+		
 		else
-			prop_instance_set_position(self.objectID, 0)
+		
+			game.prop_instance_stop_animating(self.objectID)
+			if self.parent.objectID ~= -1 then
+				position_transform_position_to_parent(2, 1, 0)
+			--prop_instance_set_position(self.objectID, 2)
+			
+				if not (self.rotationAroundX == 0) then
+					game.prop_instance_rotate_to_position(self.objectID, 2, self.animationSpeed, self.rotationAroundX)
+				else
+					game.prop_instance_animate_to_position(self.objectID, 2, self.animationSpeed)
+				end
+			else
+			--prop_instance_set_position(self.objectID, 0)
+				game.prop_instance_animate_to_position(self.objectID, 0, self.animationSpeed)
+			end
+		
 		end
+		
+		
+		
       
 	  --game.prop_instance_stop_animating(self.objectID)
 	  --game.prop_instance_animate_to_position(self.objectID, 2, 1)
@@ -380,7 +409,7 @@ function Object:updatePosition()
   
   for k, object in pairs(self.children) do
   
-    object:updatePosition()
+    object:updatePosition(teleport)
   
   end
   
@@ -440,16 +469,16 @@ function Object:translate(objectID, positionID)
 	if object == nil then return end
 	if prop_instance_is_valid(object.objectID) == false then return end
 	
-	---local x, y, z = position_get_x(0, positionID), position_get_y(0, positionID), position_get_z(0, positionID)
+	local x, y, z = position_get_x(0, positionID), position_get_y(0, positionID), position_get_z(0, positionID)
 
 	
-	dict_set_pos(object.objectID.dict, tostring(object.objectID), positionID)
-	--object:move(object.objectID, x, y, z)
+
+	object:move(object.objectID, x, y, z)
 
 end
 
 
-
+-- TODO
 function Object:scale()
 
 end

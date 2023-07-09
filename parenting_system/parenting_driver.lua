@@ -3,7 +3,7 @@
 objectsXYM3Z = {}
 
 rootObject = dofile("parenting_system/parenting.lua")
-animationSpeed = 30
+rootObject.animationSpeed = 30
 
 local display_message = game.display_message
 local prop_instance_set_position = game.prop_instance_set_position
@@ -55,19 +55,19 @@ function clearChildren(parentID)
 end
 
 
-function setPosition(objectID, positionID)
+function setPosition(objectID, positionID, teleport)
 	local object = objectsXYM3Z[objectID]
 	if object == nil then
 		display_message("Error in setPosition(). object is not exist!")
 		return
 	end
 	object:setPosition(objectID, positionID)
-	object:updatePosition()
+	object:updatePosition(teleport)
 
 end
 
 
-function move(objectID, x, y, z)
+function move(objectID, x, y, z, teleport)
     local object = objectsXYM3Z[objectID]
 	if object == nil then
 		display_message("Error in move(). object is not exist!")
@@ -75,13 +75,13 @@ function move(objectID, x, y, z)
 	end
 	
 	object:move(objectID, x, y, z)
-	object:updatePosition()
+	object:updatePosition(teleport)
 
 
 end
 
 
-function rotate(objectID, x, y, z)
+function rotate(objectID, x, y, z, teleport)
 
     local object = objectsXYM3Z[objectID]
 	if object == nil then
@@ -90,12 +90,12 @@ function rotate(objectID, x, y, z)
 	end
 	
 	object:rotate(objectID, x, y, z)
-	object:updatePosition()
+	object:updatePosition(teleport)
 	
 end
 
 
-function rotateFloating(objectID, x, y, z)
+function rotateFloating(objectID, x, y, z, teleport)
 
     local object = objectsXYM3Z[objectID]
 	if object == nil then
@@ -104,12 +104,12 @@ function rotateFloating(objectID, x, y, z)
 	end
 	
 	object:rotateFloating(objectID, x, y, z)
-	object:updatePosition()
+	object:updatePosition(teleport)
 	
 end
 
 
-function moveRotate(objectID, mx, my, mz, rx, ry, rz)
+function moveRotate(objectID, mx, my, mz, rx, ry, rz, teleport)
 	local object = objectsXYM3Z[objectID]
 	if object == nil then
 		display_message("Error in moveRotate(). object is not exist!")
@@ -117,30 +117,30 @@ function moveRotate(objectID, mx, my, mz, rx, ry, rz)
 	end
 	object:move(objectID, mx, my, mz)
 	object:rotate(objectID, rx, ry, rz)
-	object:updatePosition()
+	object:updatePosition(teleport)
 
 end
 
 
-function translate(objectID, positionID)
+function translate(objectID, positionID, teleport)
 	local object = objectsXYM3Z[objectID]
 	if object == nil then
 		display_message("Error in translate(). object is not exist!")
 		return
 	end
 	object:translate(objectID, positionID)
-	object:updatePosition()
+	object:updatePosition(teleport)
 end
 
 
-function updatePositions(objectID)
+function updatePositions(objectID, teleport)
 
 	local object = objectsXYM3Z[objectID]
 	if object == nil then
 		display_message("Error in updatePosition(). object is not exist!")
 		return
 	end
-    object:updatePosition()
+    object:updatePosition(teleport)
 
 
 end
@@ -148,7 +148,7 @@ end
 
 function setAnimationSpeed(newAnimationSpeed)
 
-	animationSpeed = newAnimationSpeed
+	rootObject.animationSpeed = newAnimationSpeed
 
 
 end
@@ -162,3 +162,20 @@ function clearAllDepencies()
 
 
 end
+
+function setRotationSpeed(objectID, newSpeed)
+	local object = objectsXYM3Z[objectID]
+	if object == nil then
+		display_message("Error in setRotationSpeed(). object is not exist!")
+		return
+	end
+	object.rotationAroundX = newSpeed
+
+end
+
+
+
+
+
+
+
